@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Target : MonoBehaviour
 {
@@ -21,7 +22,20 @@ public class Target : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            Debug.Log("Mouse was clicked");
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            Debug.DrawRay(ray.origin, ray.direction * 100, Color.red, 2.0f);
+
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                if (hit.transform == transform)
+                {
+                    Destroy(gameObject);
+                }
+            }
+        }
     }
 
     Vector3 RandomForce()
@@ -38,4 +52,13 @@ public class Target : MonoBehaviour
     {
         return new Vector3(Random.Range(-xRange, xRange), ySpawnPos);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DestroyZone"))
+        {
+            Destroy(gameObject);
+        }
+    }
 }
+
